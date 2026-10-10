@@ -1,0 +1,8 @@
+# Konfigurasi k3s server (control plane). Dipasang di /etc/rancher/k3s/config.yaml
+flannel-backend: "none"
+disable-network-policy: true
+disable:
+  - traefik
+  - servicelb
+tls-san:
+  - "192.168.122.10"
