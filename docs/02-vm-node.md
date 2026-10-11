@@ -260,5 +260,5 @@ Kernel node dicatat karena dukungan fitur Tetragon bergantung pada kernel dan op
 
 - [x] 0.4 Storage pool, image dasar terverifikasi, SSH key, `user-data`
 - [x] 0.5 Reservation DHCP, skrip `create-vm.sh`, tiga VM berjalan dan saling ping
-- [ ] Screenshot `virsh list --all` dengan tiga VM `running` (opsional) di `docs/images/`
+- [x] Screenshot `virsh list --all` dengan tiga VM `running` (opsional) di `docs/images/`
 - [ ] Diagram topologi jaringan (host, `virbr0`, tiga VM)

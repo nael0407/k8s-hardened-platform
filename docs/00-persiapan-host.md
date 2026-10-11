@@ -140,5 +140,5 @@ Pengguna tergabung di grup `docker`. Keduanya mengelola aturan firewall di host,
 
 - [x] 0.1 Verifikasi dasar virtualisasi
 - [x] 0.2 Instalasi KVM/libvirt, jaringan `default` aktif dan autostart
-- [ ] Verifikasi setelah login ulang (grup `libvirt` aktif di semua terminal, `virsh list --all` tanpa `-c`)
-- [ ] 0.3 Pemeriksaan jaringan virtual libvirt
+- [x] Verifikasi setelah login ulang (grup `libvirt` aktif di semua terminal, `virsh list --all` tanpa `-c`)
+- [x] 0.3 Pemeriksaan jaringan virtual libvirt

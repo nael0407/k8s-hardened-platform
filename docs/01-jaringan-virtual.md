@@ -130,5 +130,5 @@ Rencana alamat sementara:
 ## Status
 
 - [x] 0.3 Pemeriksaan jaringan virtual libvirt
-- [ ] Verifikasi `virbr0` berstatus UP dan VM punya akses internet (langkah 0.5)
-- [ ] Diagram topologi jaringan (setelah VM ada)
+- [x] Verifikasi `virbr0` berstatus UP dan VM punya akses internet (langkah 0.5)
+- [x] Diagram topologi jaringan (setelah VM ada)

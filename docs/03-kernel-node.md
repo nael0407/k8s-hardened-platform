@@ -7,7 +7,7 @@ Fase: 1 (langkah 1.1, hanya pemeriksaan, tidak ada perubahan pada sistem)
 
 Memastikan kernel pada node (bukan kernel host) menyediakan fitur yang disyaratkan Cilium dan Tetragon sebelum keduanya dipasang. Dukungan fitur Tetragon, terutama penegakan (enforcement), bergantung pada opsi konfigurasi kernel node, sehingga ini dicek lebih dulu dan dicocokkan dengan dokumentasi resmi.
 
-Pemeriksaan dilakukan di `k3s-server`. Node agent memakai image dasar yang sama, sehingga kernelnya diasumsikan sama. Asumsi itu diverifikasi dengan `uname -r` saat agent bergabung (langkah 1.4).
+Pemeriksaan konfigurasi dilakukan di `k3s-server`. Kernel kedua agent terverifikasi sama (`6.8.0-142-generic`, dari `uname -r` dan kolom `KERNEL-VERSION` pada `kubectl get nodes` di langkah 1.4), dan ketiganya berasal dari image dasar yang sama.
 
 ## Kernel
 
@@ -110,7 +110,6 @@ Tidak ada penghalang yang ditemukan terhadap daftar syarat resmi Cilium maupun T
 - Keberadaan berkas modul (`m`) di image: opsi bertanda modul perlu bisa dimuat. Diuji saat Cilium dipasang.
 - Fitur runtime Tetragon (`override_return` dan sejenisnya): diuji dengan `tetra probe` saat Tetragon berjalan.
 - Daftar fungsi yang bisa dioverride (`/sys/kernel/debug/error_injection/list`): butuh debugfs dan hak root, dicek di Fase 5.
-- Kernel pada node agent: diasumsikan sama, diverifikasi di langkah 1.4.
 
 ## Sumber (diakses 2026-10-10)
 
