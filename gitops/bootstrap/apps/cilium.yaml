@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cilium
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: 'https://helm.cilium.io/'
+      chart: cilium
+      targetRevision: 1.20.2
+      helm:
+        valueFiles:
+          - $values/gitops/platform/cilium/values.yaml
+    - repoURL: 'https://github.com/nael0407/k8s-hardened-platform.git'
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
