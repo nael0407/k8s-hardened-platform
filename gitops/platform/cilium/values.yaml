@@ -1,0 +1,6 @@
+# Nilai Helm untuk Cilium 1.20.2 pada klaster k3s lab.
+# CIDR pod disamakan dengan bawaan k3s (10.42.0.0/16).
+ipam:
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - "10.42.0.0/16"
