@@ -213,6 +213,42 @@ Helm chart version: 1.20.2
 
 `Hubble Relay: disabled` menegaskan Relay belum menyala, sesuai rencana.
 
+## Langkah 1.5d: tes konektivitas Cilium
+
+```bash
+cilium connectivity test
+```
+
+Hasil akhir:
+
+```text
+✅ [cilium-test-1] All 82 tests (706 actions) successful, 53 tests skipped, 1 scenarios skipped.
+```
+
+Dari 135 tes yang tersedia, 82 dijalankan dan seluruhnya berhasil, 53 dilewati, dan tidak ada yang gagal. Tes yang berhasil mencakup:
+
+- jalur pod ke pod pada node yang sama dan antar node, pod ke Service (termasuk NodePort pada ketiga node), dan resolusi DNS;
+- penegakan kebijakan: ingress dan egress deny, kebijakan berbasis identitas (service account), CIDR, entitas (`world`, `host`, `cluster`), serta `CiliumNetworkPolicy` dan `NetworkPolicy` Kubernetes;
+- kebijakan L7 (HTTP) dan TLS SNI, yang berjalan lewat Envoy;
+- akses keluar klaster (`to-entities-world`, `to-cidr-external`, `to-fqdns`);
+- `no-unexpected-packet-drops` dan `check-log-errors`, yang berarti tidak ada paket jatuh tak terduga dan tidak ada galat pada log Cilium selama tes.
+
+Alasan 53 tes dilewati (dari keluaran, semuanya bukan kegagalan):
+
+| Alasan | Contoh |
+|---|---|
+| Tes "unsafe" (dapat mengubah keadaan node) | `egress-gateway`, `host-firewall-*`, `bgp-control-plane-*`, `multicast` |
+| Fitur tidak dinyalakan | `ingress-controller`, `enable-egress-gateway`, `enable-ztunnel`, `enable-local-redirect-policy`, `loadbalancer-l7` |
+| Syarat versi | beberapa tes butuh Cilium kurang dari 1.18.0 atau 1.21.0 ke atas, sedangkan yang berjalan 1.20.2 |
+| Butuh node tanpa Cilium atau multi-klaster | `north-south-loadbalancing`, `clustermesh-*` |
+| Tes ke control plane lokal dikecualikan | `pod-to-controlplane-host`, `pod-to-k8s-on-controlplane` |
+
+Peringatan pada keluaran:
+- `Unable to contact Hubble Relay, disabling Hubble telescope and flow validation`. Hubble Relay memang belum dinyalakan, sehingga validasi aliran (*flow*) dinonaktifkan. Tes tetap berjalan dan lulus, tetapi bagian yang mengandalkan Hubble tidak diperiksa. Diperiksa ulang di Fase 3 setelah Hubble aktif.
+- `CiliumCIDRGroup is deprecated; use cilium.io/v2`: peringatan penghentian API dari CLI uji, bersifat kosmetik.
+
+Namespace uji tidak dihapus otomatis. Setelah selesai, `kubectl get ns` menampilkan `cilium-test-1`, `cilium-test-ccnp1`, dan `cilium-test-ccnp2`, yang dihapus manual. Namespace `cilium-secrets` bukan milik tes (dibuat oleh Cilium sendiri) dan tidak dihapus.
+
 ## Masalah dan keputusan
 
 **1. Unduhan Helm terputus.** `curl: (18) Transferred a partial file` pada unduhan 19,3 MB (berhenti sekitar 20%). Penyebab diduga koneksi terputus. Solusi: lanjutkan unduhan dengan `curl -C - --retry 5`, lalu validasi ulang dengan `sha256sum`. Berkas akhir berukuran 20.321.063 byte dan lolos pemeriksaan. Verifikasi checksum bukan formalitas: ia melindungi dari berkas parsial.
@@ -229,12 +265,16 @@ Helm chart version: 1.20.2
 
 **7. Seluruh komponen sistem berada di control plane.** `coredns`, `local-path-provisioner`, dan `metrics-server` dijadwalkan di `k3s-server` karena k3s tidak memberi taint pada server secara bawaan. Belum mengganggu; dicatat sebagai pertanyaan untuk fase hardening.
 
+**8. Namespace uji perlu dihapus manual.** `cilium connectivity test` meninggalkan tiga namespace (`cilium-test-1`, `cilium-test-ccnp1`, `cilium-test-ccnp2`). Dihapus dengan `kubectl delete ns`, dan `cilium-secrets` dibiarkan karena bukan milik tes.
+
+**9. Hasil tes bergantung pada kondisi tanpa Hubble.** Validasi aliran dilewati karena Relay nonaktif. Klaim "tes konektivitas lulus" berlaku untuk perilaku jaringan yang diuji lewat respons, bukan untuk validasi aliran Hubble.
+
 ## Status
 
 - [x] 1.5a Akses `kubectl` dari laptop
 - [x] 1.5b Helm dan Cilium 1.20.2 terpasang, tiga node `Ready`
 - [x] 1.5c Cilium CLI, `cilium status` `OK`
-- [ ] Tes konektivitas Cilium (opsional)
+- [x] 1.5d Tes konektivitas Cilium: 82 tes sukses, 53 dilewati, tidak ada yang gagal
 - [ ] Commit `gitops/platform/cilium/values.yaml`
 - [ ] Screenshot `kubectl get nodes -o wide` (tiga node `Ready`) dan `cilium status`
 

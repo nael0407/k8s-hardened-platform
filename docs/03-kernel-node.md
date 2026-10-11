@@ -107,7 +107,7 @@ Tidak ada penghalang yang ditemukan terhadap daftar syarat resmi Cilium maupun T
 
 ## Belum diverifikasi
 
-- Keberadaan berkas modul (`m`) di image: opsi bertanda modul perlu bisa dimuat. Diuji saat Cilium dipasang.
+- Modul kernel (`m`): setelah Cilium berjalan, `lsmod` pada `k3s-server` (pola `cls_bpf|sch_ingress|ip_set|xt_set|vxlan|geneve|sch_fq`) menampilkan `cls_bpf`, `sch_ingress`, `vxlan`, `geneve`, dan `ip_set` sudah termuat, beserta modul pendukung (`udp_tunnel`, `ip6_udp_tunnel`, `nfnetlink`). Tidak muncul: `xt_set`, `xt_comment`, dan `sch_fq` (yang tampil `sch_fq_codel` hanya karena pola `sch_fq` juga cocok dengan nama itu, dan itu modul berbeda). Mengapa ketiganya tidak termuat belum diselidiki; untuk `sch_fq`, dugaannya fitur Bandwidth Manager tidak dinyalakan. Tidak terbukti bermasalah: `cilium connectivity test` (82 tes sukses, termasuk akses keluar klaster) lulus.
 - Fitur runtime Tetragon (`override_return` dan sejenisnya): diuji dengan `tetra probe` saat Tetragon berjalan.
 - Daftar fungsi yang bisa dioverride (`/sys/kernel/debug/error_injection/list`): butuh debugfs dan hak root, dicek di Fase 5.
 
