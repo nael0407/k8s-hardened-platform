@@ -1,0 +1,37 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signature
+  annotations:
+    policies.kyverno.io/title: Verify Image Signatures
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Verifies that container images deployed in secure-demo namespace are cryptographically
+      signed by our Cosign public key. Unsigned images are strictly rejected.
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: verify-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - secure-demo
+      verifyImages:
+        - imageReferences:
+            - "ttl.sh/hardened-demo-*"
+          mutateDigest: true
+          attestors:
+            - entries:
+                - keys:
+                    publicKeys: |
+                      -----BEGIN PUBLIC KEY-----
+                      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+c/cUzT7ajSjFehkGs7BdV8x+Etj
+                      pQhTdvnmwT7H1xdqcNN2HljTlP1o53V5wB/WT5ZjFddDTVbtdMypxbcYYA==
+                      -----END PUBLIC KEY-----
+                    rekor:
+                      ignoreTlog: true

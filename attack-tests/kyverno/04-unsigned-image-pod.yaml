@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unsigned-image-pod
+  namespace: secure-demo
+spec:
+  containers:
+    - name: app
+      image: ttl.sh/hardened-demo-unsigned:2h
+      command: ["sleep", "3600"]

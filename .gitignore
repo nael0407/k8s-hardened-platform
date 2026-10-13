@@ -3,3 +3,5 @@
 *.iso
 id_*
 !*.pub
+*.key
+.~lock.*

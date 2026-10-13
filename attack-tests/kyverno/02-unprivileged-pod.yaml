@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unprivileged-pod
+  namespace: secure-demo
+spec:
+  containers:
+    - name: benign
+      image: alpine:latest
+      command: ["sleep", "3600"]
+      securityContext:
+        privileged: false
