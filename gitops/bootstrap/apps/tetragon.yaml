@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tetragon
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: 'https://helm.cilium.io/'
+      chart: tetragon
+      targetRevision: 1.7.1
+      helm:
+        valueFiles:
+          - $values/gitops/platform/tetragon/values.yaml
+    - repoURL: 'https://github.com/nael0407/k8s-hardened-platform.git'
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

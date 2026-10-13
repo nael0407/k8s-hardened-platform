@@ -1,0 +1,11 @@
+# Nilai konfigurasi Helm untuk Tetragon 1.7.1 pada klaster k3s lab.
+# DaemonSet berjalan di semua node, operator berjalan 1 replika (non-HA).
+
+tetragonOperator:
+  enabled: true
+  replicas: 1
+  tracingPolicy:
+    enabled: true
+
+crds:
+  installMethod: "operator"
