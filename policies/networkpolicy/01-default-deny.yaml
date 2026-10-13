@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1                                                                 
+kind: NetworkPolicy                                                                              
+metadata:                                                                                        
+  name: default-deny-all                                                                         
+  namespace: secure-demo                                                                         
+spec:                                                                                            
+  podSelector: {}                                                                                
+  policyTypes:                                                                                   
+  - Ingress                                                                                            
+  - Egress                                                                                       
+  egress:                                                                                        
+  # Izinkan DNS resolution ke kube-dns di kube-system                                            
+  - to:                                                                                          
+    - namespaceSelector: {}                                                                      
+      podSelector:                                                                               
+        matchLabels:                                                                             
+          k8s-app: kube-dns                                                                      
+    ports:                                                                                       
+    - protocol: UDP                                                                              
+      port: 53                                                                                   
+    - protocol: TCP                                                                              
+      port: 53
