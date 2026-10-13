@@ -163,6 +163,6 @@ Ketiga node terdaftar dengan versi k3s, kernel, dan containerd yang sama. Kernel
 - [x] 1.2 Pemeriksaan awal dan konfigurasi server di repo
 - [x] 1.3 k3s server terpasang, versi dikunci
 - [x] 1.4 Dua agent bergabung, kernel agent terverifikasi
-- [ ] 1.5a Akses `kubectl` dari laptop
-- [ ] 1.5b Cilium terpasang, semua node `Ready`
-- [ ] Screenshot `kubectl get nodes -o wide` dengan tiga node `Ready` (setelah 1.5b)
+- [x] 1.5a Akses `kubectl` dari laptop
+- [x] 1.5b Cilium terpasang, semua node `Ready`
+- [x] Screenshot `kubectl get nodes -o wide` dengan tiga node `Ready` (setelah 1.5b)

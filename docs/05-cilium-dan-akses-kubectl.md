@@ -275,8 +275,8 @@ Namespace uji tidak dihapus otomatis. Setelah selesai, `kubectl get ns` menampil
 - [x] 1.5b Helm dan Cilium 1.20.2 terpasang, tiga node `Ready`
 - [x] 1.5c Cilium CLI, `cilium status` `OK`
 - [x] 1.5d Tes konektivitas Cilium: 82 tes sukses, 53 dilewati, tidak ada yang gagal
-- [ ] Commit `gitops/platform/cilium/values.yaml`
-- [ ] Screenshot `kubectl get nodes -o wide` (tiga node `Ready`) dan `cilium status`
+- [x] Commit `gitops/platform/cilium/values.yaml`
+- [x] Screenshot `kubectl get nodes -o wide` (tiga node `Ready`) dan `cilium status`
 
 ## Sumber (diakses 2026-10-11)
 
