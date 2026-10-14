@@ -250,30 +250,6 @@ Phase D: GitOps Engine State (Argo CD)
 
 ---
 
-## 🎤 Panduan Demo Wawancara 2 Menit
-
-Saat mendemonstrasikan proyek ini kepada pewawancara teknis atau *hiring manager*:
-
-1. **Tunjukkan Isolasi Jaringan eBPF (Layer 3):**
-   ```bash
-   kubectl -n secure-demo exec attacker -- curl -s -I -m 3 http://backend-svc
-   # Narasi: "Datapath eBPF Cilium membuang paket serangan lateral di L3/L4 tanpa overhead iptables."
-   ```
-2. **Tunjukkan Penolakan Rantai Pasok (Layer 4):**
-   ```bash
-   kubectl apply -f attack-tests/kyverno/04-unsigned-image-pod.yaml
-   # Narasi: "Kyverno Validating Webhook memverifikasi tanda tangan ECDSA Cosign di pintu gerbang API sebelum pod dijadwalkan."
-   ```
-3. **Tunjukkan Pembunuhan Proses In-Kernel (Layer 5):**
-   ```bash
-   kubectl -n secure-demo exec attacker -- cat /var/run/secrets/kubernetes.io/serviceaccount/token
-   # Narasi: "Hook kprobe Tetragon mencegat pemanggilan VFS open dan langsung membunuh proses penyerang dengan SIGKILL (Exit Code 137)."
-   ```
-
-*Skenario tanya-jawab teknis lengkap dan panduan verbal tersedia di [docs/panduan-demo-wawancara.md](docs/panduan-demo-wawancara.md).*
-
----
-
 ## 📖 Dokumentasi Rekayasa Mendalam
 
 Untuk laporan mendalam mengenai setiap fase rekayasa, keputusan arsitektur, dan log terminal lengkap:

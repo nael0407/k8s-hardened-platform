@@ -250,30 +250,6 @@ Phase D: GitOps Engine State (Argo CD)
 
 ---
 
-## 🎤 2-Minute Interview Demonstration Guide
-
-When asked to showcase this project during technical interviews:
-
-1. **Show Network Dropping (Layer 3):**
-   ```bash
-   kubectl -n secure-demo exec attacker -- curl -s -I -m 3 http://backend-svc
-   # Explain: "Cilium eBPF datapath drops lateral packets at L3/L4 with zero iptables overhead."
-   ```
-2. **Show Supply Chain Denial (Layer 4):**
-   ```bash
-   kubectl apply -f attack-tests/kyverno/04-unsigned-image-pod.yaml
-   # Explain: "Kyverno Validating Webhook verifies Cosign ECDSA signatures at the API gateway before scheduling."
-   ```
-3. **Show In-Kernel SIGKILL (Layer 5):**
-   ```bash
-   kubectl -n secure-demo exec attacker -- cat /var/run/secrets/kubernetes.io/serviceaccount/token
-   # Explain: "Tetragon kprobe intercepts the VFS file open and terminates the process with SIGKILL (Exit Code 137)."
-   ```
-
-*Complete step-by-step interview script available in [docs/panduan-demo-wawancara.md](docs/panduan-demo-wawancara.md).*
-
----
-
 ## 📖 Comprehensive Engineering Documentation
 
 For exhaustive technical deep-dives, design rationale, and raw terminal logs:
