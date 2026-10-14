@@ -241,6 +241,15 @@ k8s-hardened-platform/
 - [selesai] 5.3: Penegakan Ancaman Runtime (*In-Kernel Enforcement*) via CRD `TracingPolicyNamespaced` di namespace `secure-demo`. Upaya pembacaan kredensial sensitif ServiceAccount Token (`/run/secrets/kubernetes.io/serviceaccount`) dan `/etc/shadow` berhasil digagalkan seketika di level VFS kernel (`security_file_open`) dengan pembunuhan proses via `SIGKILL` (Exit Code 137). Upaya pembukaan interactive shell (`/bin/sh`) berhasil digagalkan seketika di level syscall `sys_execve` dengan `SIGKILL` (Exit Code 137). Seluruh perintah legal aplikasi (`whoami`, `uname -a`) terverifikasi tetap berjalan mulus (Exit Code 0).
   - Dokumentasi: `docs/09-runtime-security-tetragon.md` selesai dibuat.
 - [selesai] **Fase 5 selesai** (Runtime Security dan In-Kernel Threat Enforcement Tetragon eBPF aktif dan terverifikasi penuh).
-- [berikutnya] Fase 6: Skenario Pengujian Menyeluruh, Dokumentasi Portofolio, dan Pengemasan Akhir (README portofolio mandiri, diagram arsitektur multi-layer, laporan sebelum vs sesudah, demo skenario wawancara).
-- Catatan: VM libvirt belum diset autostart; setelah laptop reboot VM harus dinyalakan dengan `virsh start`.
+- [selesai] 6.1: Pembuatan harness pengujian otomatis menyeluruh `attack-tests/run-all-verifications.sh` (executable `chmod +x`). Mengotomasi verifikasi 9 titik kontrol keamanan (Network Zero-Trust, Kyverno PSS, Cosign Supply Chain, Tetragon In-Kernel SIGKILL, Zero False-Positive, dan GitOps health). Pengujian empiris menghasilkan kelulusan sempurna: **9/9 checks passed (100%)**.
+- [selesai] 6.2: Laporan audit keamanan komprehensif end-to-end disusun dalam `docs/10-laporan-pengujian-keamanan-end-to-end.md`, memetakan setiap vektor serangan secara presisi ke taksonomi **MITRE ATT&CK for Containers** (T1570, T1611, T1610, T1525, T1552.007, T1059.004, T1565.001) dengan analisis baseline vs hardened.
+- [selesai] 6.3: Pengemasan portofolio mandiri berkualitas tinggi dengan dukungan dua bahasa (*bilingual*):
+  - `README.md`: Versi Bahasa Inggris profesional sebagai etalase utama GitHub berstandar industri internasional, dilengkapi badge status audit, diagram arsitektur Mermaid, matriks pertahanan multi-layer, trade-offs rekayasa mendalam, dan panduan reproduksi.
+  - `README.id.md`: Versi Bahasa Indonesia komprehensif dengan terminologi teknis baku yang tetap terjaga.
+  - Tautan navigasi bahasa dua arah terintegrasi di bagian atas kedua berkas.
+- [selesai] 6.4: Panduan demonstrasi langsung wawancara teknis 2 menit disusun dalam `docs/panduan-demo-wawancara.md`, mencakup 30-detik elevator pitch, 3 perintah pembuktian langsung di terminal beserta respons dan narasi teknis, serta lembar jawaban taktis untuk pertanyaan lanjutan wawancara (Tetragon vs Falco, Cilium vs Calico, Cosign offline, symlink `/var/run`, dan drift GitOps).
+- [selesai] **Fase 6 selesai** (Seluruh pengujian otomatis, laporan audit MITRE ATT&CK, dokumentasi dwibahasa, dan panduan wawancara siap dipublikasikan).
+- [selesai] **PROYEK SELESAI PENUH (Fase 0 hingga Fase 6 tuntas 100%).**
+- Catatan operasional: VM libvirt belum diset autostart; setelah laptop reboot VM dapat dinyalakan kembali dengan `virsh start k3s-server`, `virsh start k3s-agent1`, `virsh start k3s-agent2`.
+
 
