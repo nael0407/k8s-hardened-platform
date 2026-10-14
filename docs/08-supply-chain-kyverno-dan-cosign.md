@@ -381,6 +381,9 @@ ttl.sh/hardened-demo-signed:2h@sha256:7cefa58bd70cbf86bb0ef44b9c27a9c6a633763977
 ```
 *Hasil:* Kyverno secara otomatis mengunci image spec ke digest `sha256:7cefa58bd70cbf86bb0ef44b9c27a9c6a633763977ea40868d1bfe9278967b25`, membuktikan pertahanan *Supply Chain Security* aktif sempurna.
 
+#### Bukti Visual Tangkapan Layar:
+![Penolakan Image Unsigned dan Mutasi Digest Kyverno](images/kyverno-cosign-enforcement.png)
+
 ---
 
 ## Kesimpulan Fase 4

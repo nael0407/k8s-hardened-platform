@@ -249,8 +249,13 @@ lavvvet@sebastian:~$ kubectl -n secure-demo exec attacker -- whoami
 curl_user
 
 lavvvet@sebastian:~$ kubectl -n secure-demo exec attacker -- uname -a
-Linux attacker 6.8.0-146-generic #146-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep  3 16:12:30 UTC 2026 x86_64 Linux
 ```
+
+#### Bukti Visual Tangkapan Layar:
+![Bukti In-Kernel SIGKILL Tetragon Exit Code 137](images/tetragon-signkill.png)
+
+Selain itu, status integrasi seluruh komponen keamanan platform di dashboard Argo CD (`root-application`, `cilium`, `kyverno`, `tetragon`) berstatus *Healthy & Synced* terdokumentasi pada:
+![Argo CD Platform Overview](images/argocd-platform-overview.png)
 
 ---
 
