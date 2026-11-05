@@ -265,4 +265,3 @@ Untuk laporan mendalam mengenai setiap fase rekayasa, keputusan arsitektur, dan 
 - [08. Keamanan Rantai Pasok dengan Kyverno & Cosign](docs/08-supply-chain-kyverno-dan-cosign.md)
 - [09. Keamanan Runtime eBPF & Penegakan In-Kernel Tetragon](docs/09-runtime-security-tetragon.md)
 - [10. Laporan Pengujian Keamanan Komprehensif End-to-End](docs/10-laporan-pengujian-keamanan-end-to-end.md)
-- [Panduan Praktis Demonstrasi Langsung Wawancara 2 Menit](docs/panduan-demo-wawancara.md)
