@@ -93,17 +93,17 @@ flowchart TD
 
 Setiap kontrol keamanan diuji secara ketat dengan pengujian sebelum (*baseline*) dan sesudah (*hardened*). Seluruh hasil diverifikasi secara deterministik menggunakan skrip pengujian otomatis:
 
-| Teknik MITRE ATT&CK | Vektor Serangan | Kontrol Keamanan | Baseline (Sebelum) | Hardened (Sesudah) | Bukti Forensik & Status |
-|---|---|---|---|---|---|
-| **T1570: Lateral Movement** | Akses jaringan antar-pod tanpa otorisasi | Cilium eBPF NetworkPolicy | Akses Diizinkan (`HTTP 200 OK`) | **Paket Dibuang di Kernel (`exit code 28`)** | [Bukti Visual Hubble UI](docs/images/fase3_hubble-drop.png) <br> `PASS` |
-| **T1611: Privilege Escalation** | Deploy pod dengan `privileged: true` | Kyverno ClusterPolicy | Pod Dibuat & Menjalankan Root Host | **Ditolak di Admisi (HTTP 403)** | Webhook memblokir sebelum masuk etcd <br> `PASS` |
-| **T1610: Container Deployment** | Pod berbagi namespace PID host (`hostPID: true`) | Kyverno ClusterPolicy | Proses host terlihat di kontainer | **Ditolak di Admisi (HTTP 403)** | Webhook memblokir sebelum masuk etcd <br> `PASS` |
-| **T1525: Supply Chain Tampering** | Deploy citra kontainer tanpa tanda tangan | Cosign + Kyverno `verifyImages` | Kode sembarang dijalankan | **Ditolak di Admisi (`no signatures found`)** | [Bukti Kyverno & Cosign](docs/images/kyverno-cosign-enforcement.png) <br> `PASS` |
-| **T1525: Tag Poaching** | Menimpa tag OCI mutable (`:2h`) di registri | Kyverno `mutateDigest: true` | Payload kontainer diganti penyerang | **Tag Dimutasi ke Digest SHA256 Immutable** | Tag `:2h` dipin ke `@sha256:...` <br> `PASS` |
-| **T1552.007: Credential Access** | Membaca token `/var/run/secrets/.../token` | Tetragon eBPF `security_file_open` | Token Terbaca (`eyJhbGci...`) | **Dibunuh di Kernel via SIGKILL (`Exit Code 137`)** | [Bukti Tetragon Sigkill](docs/images/tetragon-signkill.png) <br> `PASS` |
-| **T1059.004: Command Execution** | Membuka shell interaktif (`/bin/sh`) | Tetragon eBPF `sys_execve` | Sesi shell interaktif terbuka | **Dibunuh di Kernel via SIGKILL (`Exit Code 137`)** | [Bukti Tetragon Sigkill](docs/images/tetragon-signkill.png) <br> `PASS` |
-| **Akurasi Operasional (0% FP)** | Eksekusi perintah aplikasi legal (`whoami`, `uname -a`) | Presisi kprobe & logika whitelist | Berjalan normal (Exit 0) | **Berjalan normal (Exit 0, `curl_user`)** | Nol *false-positive* <br> `PASS` |
-| **T1565.001: Configuration Drift** | Sabotase manual dengan `kubectl edit` | GitOps Engine Argo CD | Kluster menyimpang dari Git | **Otomatis Dipulihkan (*Self-Heal*) ke Git** | [Bukti Dashboard Argo CD](docs/images/argocd-platform-overview.png) <br> `PASS` |
+| Referensi / Taktik MITRE | Nama Resmi Teknik & Taktik | Vektor Serangan | Kontrol Keamanan | Baseline (Sebelum) | Hardened (Sesudah) | Bukti Forensik & Status |
+|---|---|---|---|---|---|---|
+| **TA0008** *(Taktik)* | **Lateral Movement** <br>*(Related: T1570 Lateral Tool Transfer)* | Akses jaringan antar-pod tanpa otorisasi | Cilium eBPF NetworkPolicy | Akses Diizinkan (`HTTP 200 OK`) | **Paket Dibuang di Kernel (`exit code 28`)** | [Bukti Visual Hubble UI](docs/images/fase3_hubble-drop.png) <br> `PASS` |
+| **T1611** | **T1611 Escape to Host** <br>*(Taktik: TA0004 Privilege Escalation)* | Deploy pod dengan `privileged: true` | Kyverno ClusterPolicy | Pod Dibuat & Menjalankan Root Host | **Ditolak di Admisi (HTTP 403)** | Webhook memblokir sebelum masuk etcd <br> `PASS` |
+| **T1610** | **T1610 Deploy Container** <br>*(Taktik: TA0002 Execution; Related: T1611)* | Pod berbagi namespace PID host (`hostPID: true`) | Kyverno ClusterPolicy | Proses host terlihat di kontainer | **Ditolak di Admisi (HTTP 403)** | Webhook memblokir sebelum masuk etcd <br> `PASS` |
+| **T1525** | **T1525 Implant Internal Image** <br>*(Taktik: TA0003 Persistence; Related: T1195.002)* | Deploy citra kontainer tanpa tanda tangan | Cosign + Kyverno `verifyImages` | Kode sembarang dijalankan | **Ditolak di Admisi (`no signatures found`)** | [Bukti Kyverno & Cosign](docs/images/kyverno-cosign-enforcement.png) <br> `PASS` |
+| **T1525** | **T1525 Implant Internal Image: Tag Poaching** <br>*(Taktik: TA0003 Persistence)* | Menimpa tag OCI mutable (`:2h`) di registri | Kyverno `mutateDigest: true` | Payload kontainer diganti penyerang | **Tag Dimutasi ke Digest SHA256 Immutable** | Tag `:2h` dipin ke `@sha256:...` <br> `PASS` |
+| **T1552.007** | **T1552.007 Unsecured Credentials: Container API** <br>*(Taktik: TA0006 Credential Access)* | Membaca token `/var/run/secrets/.../token` | Tetragon eBPF `security_file_open` | Token Terbaca (`eyJhbGci...`) | **Dibunuh di Kernel via SIGKILL (`Exit Code 137`)** | [Bukti Tetragon Sigkill](docs/images/tetragon-signkill.png) <br> `PASS` |
+| **T1059.004** | **T1059.004 Command and Scripting Interpreter: Unix Shell** <br>*(Taktik: TA0002 Execution)* | Membuka shell interaktif (`/bin/sh`) | Tetragon eBPF `sys_execve` | Sesi shell interaktif terbuka | **Dibunuh di Kernel via SIGKILL (`Exit Code 137`)** | [Bukti Tetragon Sigkill](docs/images/tetragon-signkill.png) <br> `PASS` |
+| **-** | **Operasional Legal / Non-Malicious** <br>*(Quality Assurance - 0% False Positive)* | Eksekusi perintah aplikasi legal (`whoami`, `uname -a`) | Presisi kprobe & logika whitelist | Berjalan normal (Exit 0) | **Berjalan normal (Exit 0, `curl_user`)** | Nol *false-positive* <br> `PASS` |
+| **-** *(Uji Manual)* | **Configuration Drift & Self-Healing** <br>*(Integritas State GitOps - Diuji Manual)* | Sabotase manual dengan `kubectl edit` | GitOps Engine Argo CD | Kluster menyimpang dari Git | **Otomatis Dipulihkan (*Self-Heal*) ke Git** | [Bukti Dashboard Argo CD](docs/images/argocd-platform-overview.png) <br> `PASS` |
 
 ---
 
@@ -219,23 +219,23 @@ Untuk menjalankan seluruh 9 poin uji penetrasi dan verifikasi keamanan dalam kur
 Phase A: Network Security (Cilium eBPF Zero-Trust)
   [✔ PASS] Zero-Trust: Frontend Legitimate Ingress
           Evidence: HTTP 200 OK from backend-svc
-  [✔ PASS] Zero-Trust: Attacker Lateral Movement Blocked
+  [✔ PASS] TA0008 Lateral Movement: Pod-to-Pod Traffic Blocked (Related: T1570)
           Evidence: eBPF Packet Dropped (curl exit code 28 timeout)
 
 Phase B: Supply Chain Security & Admission Control (Kyverno + Cosign)
-  [✔ PASS] Admission Control: Privileged Pod Denial
+  [✔ PASS] T1611 Escape to Host: Privileged Pod Denial
           Evidence: Blocked by Kyverno (disallow-privileged-containers)
-  [✔ PASS] Admission Control: HostPID Namespace Denial
+  [✔ PASS] T1610 Deploy Container: HostPID Namespace Denial (Related: T1611)
           Evidence: Blocked by Kyverno (disallow-host-namespaces)
-  [✔ PASS] Supply Chain: Unsigned Image Admission Rejection
+  [✔ PASS] T1525 Implant Internal Image: Unsigned Image Admission Rejection
           Evidence: Blocked by Cosign policy (no signatures found)
 
 Phase C: In-Kernel Runtime Threat Enforcement (Tetragon eBPF)
-  [✔ PASS] Runtime Enforcement: ServiceAccount Token Harvesting
+  [✔ PASS] T1552.007 Unsecured Credentials: Container API Harvesting
           Evidence: Killed in-kernel by Tetragon SIGKILL (Exit Code 137)
-  [✔ PASS] Runtime Enforcement: Unauthorized Interactive Shell Execution
+  [✔ PASS] T1059.004 Command and Scripting Interpreter: Unix Shell Execution
           Evidence: Killed in-kernel by Tetragon SIGKILL (Exit Code 137)
-  [✔ PASS] Runtime Accuracy: Benign Application Execution
+  [✔ PASS] Benign Baseline: Legal Application Execution
           Evidence: whoami successfully returned 'curl_user' (Exit Code 0)
 
 Phase D: GitOps Engine State (Argo CD)

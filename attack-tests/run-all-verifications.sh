@@ -53,64 +53,64 @@ else
     report_fail "Zero-Trust: Frontend Legitimate Ingress" "Expected HTTP 200, got: $FRONTEND_STATUS"
 fi
 
-# Test 2: Attacker to Backend (Dropped)
+# Test 2: Attacker to Backend (Dropped) - TA0008 Lateral Movement (Related: T1570 Lateral Tool Transfer)
 ATTACKER_DROP=$(kubectl -n secure-demo exec attacker -- curl -s -o /dev/null -m 3 http://backend-svc 2>&1 || true)
 if [[ "$ATTACKER_DROP" == *"exit code 28"* ]] || [[ "$ATTACKER_DROP" == *"timed out"* ]] || [[ "$ATTACKER_DROP" == *"Connection timed out"* ]]; then
-    report_pass "Zero-Trust: Attacker Lateral Movement Blocked" "eBPF Packet Dropped (curl exit code 28 timeout)"
+    report_pass "TA0008 Lateral Movement: Pod-to-Pod Traffic Blocked (Related: T1570)" "eBPF Packet Dropped (curl exit code 28 timeout)"
 else
-    report_fail "Zero-Trust: Attacker Lateral Movement Blocked" "Attacker traffic was not dropped!"
+    report_fail "TA0008 Lateral Movement: Pod-to-Pod Traffic Blocked (Related: T1570)" "Attacker traffic was not dropped!"
 fi
 
 echo -e "\n${YELLOW}Phase B: Supply Chain Security & Admission Control (Kyverno + Cosign)${NC}"
 
-# Test 3: Privileged Container Denial
+# Test 3: T1611 Escape to Host (Privileged Container Denial)
 PRIV_OUTPUT=$(kubectl apply -f attack-tests/kyverno/01-privileged-pod.yaml 2>&1 || true)
 if [[ "$PRIV_OUTPUT" == *"denied the request"* ]] && [[ "$PRIV_OUTPUT" == *"disallow-privileged-containers"* ]]; then
-    report_pass "Admission Control: Privileged Pod Denial" "Blocked by Kyverno (disallow-privileged-containers)"
+    report_pass "T1611 Escape to Host: Privileged Pod Denial" "Blocked by Kyverno (disallow-privileged-containers)"
 else
-    report_fail "Admission Control: Privileged Pod Denial" "Privileged pod was not rejected!"
+    report_fail "T1611 Escape to Host: Privileged Pod Denial" "Privileged pod was not rejected!"
 fi
 
-# Test 4: HostPID Sharing Denial
+# Test 4: T1610 Deploy Container (HostPID Namespace Denial; Related: T1611 Escape to Host)
 HOSTPID_OUTPUT=$(kubectl apply -f attack-tests/kyverno/03-hostpid-pod.yaml 2>&1 || true)
 if [[ "$HOSTPID_OUTPUT" == *"denied the request"* ]] && [[ "$HOSTPID_OUTPUT" == *"disallow-host-namespaces"* ]]; then
-    report_pass "Admission Control: HostPID Namespace Denial" "Blocked by Kyverno (disallow-host-namespaces)"
+    report_pass "T1610 Deploy Container: HostPID Namespace Denial (Related: T1611)" "Blocked by Kyverno (disallow-host-namespaces)"
 else
-    report_fail "Admission Control: HostPID Namespace Denial" "HostPID pod was not rejected!"
+    report_fail "T1610 Deploy Container: HostPID Namespace Denial (Related: T1611)" "HostPID pod was not rejected!"
 fi
 
-# Test 5: Unsigned Image Rejection
+# Test 5: T1525 Implant Internal Image (Unsigned Image Rejection; Related: T1195.002 Supply Chain)
 UNSIGNED_OUTPUT=$(kubectl apply -f attack-tests/kyverno/04-unsigned-image-pod.yaml 2>&1 || true)
 if [[ "$UNSIGNED_OUTPUT" == *"denied the request"* ]] && [[ "$UNSIGNED_OUTPUT" == *"no signatures found"* ]]; then
-    report_pass "Supply Chain: Unsigned Image Admission Rejection" "Blocked by Cosign policy (no signatures found)"
+    report_pass "T1525 Implant Internal Image: Unsigned Image Admission Rejection" "Blocked by Cosign policy (no signatures found)"
 else
-    report_fail "Supply Chain: Unsigned Image Admission Rejection" "Unsigned image was not rejected!"
+    report_fail "T1525 Implant Internal Image: Unsigned Image Admission Rejection" "Unsigned image was not rejected!"
 fi
 
 echo -e "\n${YELLOW}Phase C: In-Kernel Runtime Threat Enforcement (Tetragon eBPF)${NC}"
 
-# Test 6: In-Kernel SIGKILL on Token Theft
+# Test 6: T1552.007 Unsecured Credentials: Container API (Token Harvesting)
 TOKEN_OUTPUT=$(kubectl -n secure-demo exec attacker -- cat /var/run/secrets/kubernetes.io/serviceaccount/token 2>&1 || true)
 if [[ "$TOKEN_OUTPUT" == *"exit code 137"* ]]; then
-    report_pass "Runtime Enforcement: ServiceAccount Token Harvesting" "Killed in-kernel by Tetragon SIGKILL (Exit Code 137)"
+    report_pass "T1552.007 Unsecured Credentials: Container API Harvesting" "Killed in-kernel by Tetragon SIGKILL (Exit Code 137)"
 else
-    report_fail "Runtime Enforcement: ServiceAccount Token Harvesting" "Expected exit code 137, got: $TOKEN_OUTPUT"
+    report_fail "T1552.007 Unsecured Credentials: Container API Harvesting" "Expected exit code 137, got: $TOKEN_OUTPUT"
 fi
 
-# Test 7: In-Kernel SIGKILL on Shell Execution
+# Test 7: T1059.004 Command and Scripting Interpreter: Unix Shell Execution
 SHELL_OUTPUT=$(kubectl -n secure-demo exec attacker -- /bin/sh -c "echo breached" 2>&1 || true)
 if [[ "$SHELL_OUTPUT" == *"exit code 137"* ]]; then
-    report_pass "Runtime Enforcement: Unauthorized Interactive Shell Execution" "Killed in-kernel by Tetragon SIGKILL (Exit Code 137)"
+    report_pass "T1059.004 Command and Scripting Interpreter: Unix Shell Execution" "Killed in-kernel by Tetragon SIGKILL (Exit Code 137)"
 else
-    report_fail "Runtime Enforcement: Unauthorized Interactive Shell Execution" "Expected exit code 137, got: $SHELL_OUTPUT"
+    report_fail "T1059.004 Command and Scripting Interpreter: Unix Shell Execution" "Expected exit code 137, got: $SHELL_OUTPUT"
 fi
 
-# Test 8: Benign Process Allowed (No False Positives)
+# Test 8: Benign Process Allowed (Quality Assurance - Zero False Positives)
 WHOAMI_OUTPUT=$(kubectl -n secure-demo exec attacker -- whoami 2>&1 || true)
 if [ "$WHOAMI_OUTPUT" == "curl_user" ]; then
-    report_pass "Runtime Accuracy: Benign Application Execution" "whoami successfully returned 'curl_user' (Exit Code 0)"
+    report_pass "Benign Baseline: Legal Application Execution" "whoami successfully returned 'curl_user' (Exit Code 0)"
 else
-    report_fail "Runtime Accuracy: Benign Application Execution" "Benign execution failed: $WHOAMI_OUTPUT"
+    report_fail "Benign Baseline: Legal Application Execution" "Benign execution failed: $WHOAMI_OUTPUT"
 fi
 
 echo -e "\n${YELLOW}Phase D: GitOps Engine State (Argo CD)${NC}"
